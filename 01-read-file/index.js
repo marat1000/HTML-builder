@@ -9,4 +9,4 @@ stream.on('readable', () => {
   stream.destroy();
 });
 
-stream.on('error', (err) => console.error('' + err));
+stream.on('error', (error) => console.error('' + error));
