@@ -5,9 +5,7 @@ const fsPromises = fs.promises;
 const folderInit = path.join(__dirname, 'files');
 const folder = `${folderInit}-copy`;
 
-fsPromises.rm(folder, {recursive: true, force: true}).then(function () {
-  copy();
-}).catch(function () {
+fs.promises.rm(folder, {recursive: true, force: true}).finally(() => {
   copy();
 });
 

@@ -5,9 +5,7 @@ const fsPromises = fs.promises;
 const folderInit = path.join(__dirname, 'styles');
 const bundle = path.join(__dirname, 'project-dist', 'bundle.css');
 
-fsPromises.rm(bundle, {recursive: true, force: true}).then(function () {
-  copy();
-}).catch(function () {
+fsPromises.rm(bundle, {recursive: true, force: true}).finally(() => {
   copy();
 });
 
