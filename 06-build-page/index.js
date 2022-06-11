@@ -22,15 +22,13 @@ fs.rm(folder, {recursive: true, force: true}, () => {
 });
 
 function copyAssets(currentFolder, currentFolderInit) {
-  fsPromises.mkdir(currentFolder, {recursive: true}).then(function () {}).catch(function () {});
+  fsPromises.mkdir(currentFolder, {recursive: true});
   fs.readdir(currentFolderInit, {withFileTypes: true}, function (err, items) {
     for (const item of items) {
       if (item.isFile()) {
         const pathToFile = path.join(currentFolderInit, item.name);
         const pathToFile2 = path.join(currentFolder, item.name);
-        fsPromises.copyFile(pathToFile, pathToFile2).then(function () {
-        }).catch(function () {
-        });
+        fsPromises.copyFile(pathToFile, pathToFile2);
       } else {
         copyAssets(path.join(currentFolder, item.name), path.join(currentFolderInit, item.name));
       }
@@ -58,50 +56,36 @@ function copyCSS() {
           css,
           (err) => {
             if (err) throw err;
-            for (const item of items) {
-              if (item.isFile() && path.extname(item.name) === '.css' && item.name !== 'header.css') {
-                let css = '';
-                const pathToCSS = path.join(stylesInit, path.basename(item.name));
-                const stream = fs.createReadStream(pathToCSS, 'utf-8');
-                stream.on('data', chunk => css += chunk.toString());
-                stream.on('end', () => {
-                  css = `${css}
-`;
-                  fs.appendFile(
-                    style,
-                    css,
-                    (err) => {
-                      if (err) throw err;
-                    }
-                  );
-                });
-              }
-            }
+            goThroughCSS(items);
           }
         );
       });
     } else {
-      for (const item of items) {
-        if (item.isFile() && path.extname(item.name) === '.css') {
-          let css = '';
-          const pathToCSS = path.join(stylesInit, path.basename(item.name));
-          const stream = fs.createReadStream(pathToCSS, 'utf-8');
-          stream.on('data', chunk => css += chunk.toString());
-          stream.on('end', () => {
-            css = `${css}
-`;
-            fs.appendFile(
-              style,
-              css,
-              (err) => {
-                if (err) throw err;
-              }
-            );
-          });
-        }
-      }
+      goThroughCSS(items);
     }
   });
+}
+
+function goThroughCSS(files) {
+  for (const file of files) {
+    if (file.isFile() && path.extname(file.name) === '.css' && file.name !== 'header.css') {
+      let css = '';
+      const pathToCSS = path.join(stylesInit, path.basename(file.name));
+      const stream = fs.createReadStream(pathToCSS, 'utf-8');
+      stream.on('data', chunk => css += chunk.toString());
+      stream.on('end', () => {
+        css = `${css}
+`;
+        fs.appendFile(
+          style,
+          css,
+          (err) => {
+            if (err) throw err;
+          }
+        );
+      });
+    }
+  }
 }
 
 function bundleHTML() {
